@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Smart Crop Recommendation{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Find the right crop for your farm</h1>
+      <p class="hero-tagline">Two ways to look at the same question.</p>
+      <p class="hero-lede">
+        Enter your soil test and weather figures to see what a trained model
+        predicts, or pick a Tamil Nadu district to see what farmers there
+        actually grew. Each answer tells you where it came from.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{{ url_for('soil_form') }}">Analyse my soil</a>
+        <a class="btn btn-outline" href="{{ url_for('tamil_nadu') }}">Explore Tamil Nadu</a>
+      </div>
+    </div>
+
+    <div class="hero-panel">
+      <h2>Choose how you want to start</h2>
+      <div class="mode-split">
+        <a class="mode-card" href="{{ url_for('soil_form') }}">
+          <h3>Soil-based AI</h3>
+          <p>Get crop recommendations from soil and environmental conditions.</p>
+          <span class="mode-source">Machine learning prediction &middot; {{ crop_count }} crops</span>
+        </a>
+        <a class="mode-card" href="{{ url_for('tamil_nadu') }}">
+          <h3>Tamil Nadu region</h3>
+          <p>Explore crops based on district-level agricultural data.</p>
+          <span class="mode-source">Official statistics &middot; {{ district_count }} districts</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-head">
+      <h2>How the soil analysis works</h2>
+      <p>Four steps, and you can see the reasoning behind every result.</p>
+    </div>
+    <div class="steps grid grid-4">
+      <article class="step">
+        <h3>Enter your conditions</h3>
+        <p>Seven readings: nitrogen, phosphorus, potassium, pH, temperature, humidity and rainfall.</p>
+      </article>
+      <article class="step">
+        <h3>The model analyses them</h3>
+        <p>A {{ algorithm }} trained on 2,200 labelled samples scores all {{ crop_count }} crops it knows.</p>
+      </article>
+      <article class="step">
+        <h3>See the top three</h3>
+        <p>The three highest-scoring crops, with the model's own probability for each.</p>
+      </article>
+      <article class="step">
+        <h3>Understand why</h3>
+        <p>Each card shows how your readings compare with the data recorded for that crop.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>What this project includes</h2>
+    </div>
+    <div class="grid grid-4">
+      <article class="feature">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 4 13V8h5a7 7 0 0 1 7 7v5"/><path d="M11 20c0-5 2.5-9 8-11"/>
+          </svg>
+        </span>
+        <h3>AI crop prediction</h3>
+        <p>A trained classifier ranks crops from your soil and weather readings.</p>
+      </article>
+      <article class="feature">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </span>
+        <h3>Tamil Nadu insights</h3>
+        <p>Agro-climatic zone, soils and recorded crop area for {{ district_count }} districts.</p>
+      </article>
+      <article class="feature">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>
+          </svg>
+        </span>
+        <h3>Explainable results</h3>
+        <p>Model probabilities and feature importances, shown as the model reports them.</p>
+      </article>
+      <article class="feature">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h7a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4Z"/><path d="M20 4h-7a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h7Z"/>
+          </svg>
+        </span>
+        <h3>Crop information</h3>
+        <p>One shared crop library covering both features, with sources marked.</p>
+      </article>
+    </div>
+
+    <div class="note mt-lg">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+      <p>
+        The two features are separate systems. The soil analysis is a prediction from a
+        machine learning model; the Tamil Nadu pages are a lookup of published statistics.
+        Neither one feeds the other. <a href="{{ url_for('about') }}">Read the methods and limitations</a>.
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

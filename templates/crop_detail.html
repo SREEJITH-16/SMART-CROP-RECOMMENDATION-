@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ crop.name }} &middot; Smart Crop Recommendation{% endblock %}
+
+{% set readable = {'N':'Nitrogen','P':'Phosphorus','K':'Potassium','temperature':'Temperature','humidity':'Humidity','ph':'Soil pH','rainfall':'Rainfall'} %}
+
+{% block content %}
+<div class="container">
+  <p style="padding-top:1.6rem">
+    <a class="btn btn-outline btn-sm" href="{{ url_for('crop_guide') }}">Back to crop guide</a>
+  </p>
+
+  <div class="detail-grid" style="padding:1.4rem 0 1rem">
+    <div class="detail-media">
+      <img src="{{ url_for('static', filename='crops/' ~ crop_image(crop.key)) }}"
+           alt="{{ crop_image_alt(crop.key) }}" decoding="async">
+      {% if crop_image_is_placeholder(crop.key) %}
+      <p class="field-help" style="margin-top:.6rem">
+        Placeholder illustration, not a photograph of the crop.
+      </p>
+      {% endif %}
+    </div>
+
+    <div>
+      <h1>{{ crop.name }}</h1>
+      <span class="tag-row" style="margin-bottom:1rem">
+        <span class="tag">{{ crop.category }}</span>
+        {% if crop.in_ml_model %}<span class="tag">Predicted by the AI model</span>{% endif %}
+        {% if crop.in_tn_dataset %}<span class="tag tag-stat">In Tamil Nadu data</span>{% endif %}
+      </span>
+      <p>{{ crop.description }}</p>
+
+      <h2 style="margin-top:1.6rem">General information</h2>
+      <p class="text-muted small">
+        Indicative characteristics for orientation. These are not measurements from
+        the project's datasets.
+      </p>
+      <dl class="fact-list">
+        <div class="fact"><dt>Soil preference</dt><dd>{{ crop.general.soil or 'Data not available' }}</dd></div>
+        <div class="fact"><dt>Temperature</dt><dd>{{ crop.general.temperature or 'Data not available' }}</dd></div>
+        <div class="fact"><dt>Water requirement</dt><dd>{{ crop.general.water_requirement or 'Data not available' }}</dd></div>
+        <div class="fact"><dt>Growing period</dt><dd>{{ crop.general.growing_period or 'Data not available' }}</dd></div>
+        <div class="fact"><dt>Season</dt><dd>{{ crop.general.season or 'Data not available' }}</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="card-body">
+      <h2>Values recorded in the training dataset</h2>
+      {% if observed %}
+        <p class="text-muted small">
+          The minimum, maximum and mean of each input across the samples labelled
+          "{{ crop.name }}" in the ML training data. These are the figures the model
+          learned from, measured &mdash; not recommendations.
+        </p>
+        <div class="table-scroll" style="margin-top:1rem">
+          <table class="data">
+            <thead>
+              <tr><th scope="col">Parameter</th><th scope="col">Minimum</th><th scope="col">Maximum</th><th scope="col">Mean</th></tr>
+            </thead>
+            <tbody>
+              {% for key, stats in observed.items() %}
+              <tr>
+                <th scope="row">{{ readable[key] }} {% if fields[key].unit %}<span class="text-muted small">({{ fields[key].unit }})</span>{% endif %}</th>
+                <td>{{ '%g'|format(stats.min|round(1)) }}</td>
+                <td>{{ '%g'|format(stats.max|round(1)) }}</td>
+                <td>{{ '%g'|format(stats.mean|round(1)) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted">
+          Data not available. {{ crop.name }} appears only in the Tamil Nadu regional
+          dataset, which records cultivated area rather than soil and weather readings,
+          so there are no measured ranges to show and the AI model cannot predict it.
+        </p>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.name }} &middot; Smart Crop Recommendation{% endblock %}
+
+{% block content %}
+<div class="container">
+  <p style="padding-top:1.6rem">
+    <a class="btn btn-outline btn-sm" href="{{ url_for('tamil_nadu') }}">Back to district selection</a>
+  </p>
+
+  <div class="page-head" style="text-align:left; padding-top:.8rem">
+    <span class="provenance provenance-stat">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      Regional crop profile &middot; {{ profile.data_year }}
+    </span>
+    <h1 style="margin-top:.7rem">{{ profile.name }}</h1>
+    <p style="margin-inline:0">Historically prominent crops, based on recorded cultivated area.</p>
+  </div>
+
+  <div class="grid grid-2">
+    <section class="card">
+      <div class="card-body">
+        <h2>District characteristics</h2>
+        <dl class="fact-list">
+          <div class="fact">
+            <dt>Agro-climatic zone</dt>
+            <dd>{{ profile.agro_climatic_zone }}</dd>
+          </div>
+          <div class="fact">
+            <dt>Major soil types</dt>
+            <dd>
+              {% if profile.major_soil_types %}
+                <span class="chip-row">
+                  {% for soil in profile.major_soil_types %}<span class="chip">{{ soil }}</span>{% endfor %}
+                </span>
+              {% else %}
+                Data not available
+              {% endif %}
+            </dd>
+          </div>
+          <div class="fact">
+            <dt>Reference year</dt>
+            <dd>{{ profile.data_year }}</dd>
+          </div>
+          <div class="fact">
+            <dt>Annual rainfall</dt>
+            <dd>Data not available <span class="text-muted small">&mdash; rainfall is not part of the supplied regional dataset.</span></dd>
+          </div>
+          <div class="fact">
+            <dt>Recorded principal-crop area</dt>
+            <dd>{{ profile.total_recorded_area_ha|hectares }}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-body">
+        <h2>Regional crop profile</h2>
+        {% if profile.has_crop_data %}
+          <p class="text-muted small">Ranked by cultivated area recorded in {{ profile.data_year }}.</p>
+          <ol class="crop-rank" style="margin-top:1rem">
+            {% for crop in profile.crops %}
+            <li>
+              <span class="num" aria-hidden="true">{{ crop.rank }}</span>
+              <span>
+                <span class="name">{{ crop.name }}</span>
+                <span class="bar" style="margin-top:.3rem"><span style="width: {{ crop.share_of_top }}%"></span></span>
+              </span>
+              <span class="area">{{ crop.area_ha|hectares }}</span>
+            </li>
+            {% endfor %}
+          </ol>
+          <div class="note">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+            <p>
+              These are the major crops recorded in this district. Cultivated area is
+              not a success probability &mdash; {{ profile.crops[0].name }} leads here because
+              more land was under it, which reflects irrigation, markets and history.
+            </p>
+          </div>
+        {% else %}
+          <p class="text-muted">
+            Data not available. No principal-crop area was recorded for this district
+            in the supplied dataset.
+          </p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <section class="card mt-lg">
+    <div class="card-body">
+      <h2>Where this came from</h2>
+      <dl class="fact-list">
+        <div class="fact"><dt>Primary source</dt><dd>{{ profile.source }}</dd></div>
+        {% if profile.source_notes %}
+        <div class="fact"><dt>Source notes</dt><dd>{{ profile.source_notes }}</dd></div>
+        {% endif %}
+      </dl>
+    </div>
+  </section>
+
+  <div class="form-actions">
+    <a class="btn btn-outline" href="{{ url_for('tamil_nadu') }}">Choose another district</a>
+    <a class="btn btn-primary" href="{{ url_for('soil_form') }}">Run a soil analysis</a>
+  </div>
+</div>
+{% endblock %}

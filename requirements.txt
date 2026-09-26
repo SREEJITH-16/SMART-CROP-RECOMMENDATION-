@@ -1,0 +1,12 @@
+# Smart Crop Recommendation - runtime dependencies
+#
+# scikit-learn is deliberately NOT pinned to 1.3.2 (the version that created
+# model.pkl). core/ml_model.py migrates the old pickle at load time, so the
+# project runs on current scikit-learn. Verified against 1.8.0.
+# The floor is 1.3 because the migration detects and handles both formats.
+
+Flask>=3.0,<4.0
+scikit-learn>=1.3
+numpy>=1.24
+pandas>=2.0
+gunicorn>=21.0

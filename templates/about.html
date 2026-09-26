@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Methods and limitations &middot; Smart Crop Recommendation{% endblock %}
+
+{% set readable = {'N':'Nitrogen','P':'Phosphorus','K':'Potassium','temperature':'Temperature','humidity':'Humidity','ph':'Soil pH','rainfall':'Rainfall'} %}
+
+{% block content %}
+<div class="container">
+  <div class="page-head">
+    <h1>How this works, and what it cannot do</h1>
+    <p>Everything the application claims, with its source and its limits.</p>
+  </div>
+
+  <!-- Two pipelines -->
+  <section class="grid grid-2">
+    <article class="card">
+      <div class="card-body">
+        <span class="provenance">Pipeline 1 &middot; Machine learning</span>
+        <h2 style="margin-top:.8rem">Soil-based prediction</h2>
+        <ol class="stack-sm" style="padding-left:1.1rem; color:var(--muted); font-size:.94rem">
+          <li>User enters seven soil and environmental values</li>
+          <li>Values are validated and ordered as {{ features|join(', ') }}</li>
+          <li>MinMaxScaler, then StandardScaler</li>
+          <li>{{ algorithm }} scores all {{ crop_count }} crop classes</li>
+          <li>The three highest class probabilities are shown</li>
+        </ol>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-body">
+        <span class="provenance provenance-stat">Pipeline 2 &middot; Statistics lookup</span>
+        <h2 style="margin-top:.8rem">Tamil Nadu regional profile</h2>
+        <ol class="stack-sm" style="padding-left:1.1rem; color:var(--muted); font-size:.94rem">
+          <li>User selects one of {{ district_count }} districts</li>
+          <li>The district row is read from the {{ data_year }} dataset</li>
+          <li>Agro-climatic zone and major soils are displayed as recorded</li>
+          <li>Crops are sorted by cultivated area in hectares</li>
+          <li>The ranking is labelled as a regional profile, never as a prediction</li>
+        </ol>
+      </div>
+    </article>
+  </section>
+
+  <!-- Model -->
+  <section class="card mt-lg">
+    <div class="card-body">
+      <h2>The model</h2>
+      <dl class="fact-list">
+        <div class="fact"><dt>Algorithm</dt><dd>{{ algorithm }} (100 trees), from the original project. Not retrained.</dd></div>
+        <div class="fact"><dt>Training data</dt><dd>2,200 labelled samples across {{ crop_count }} crops</dd></div>
+        <div class="fact"><dt>Input features</dt><dd>{{ features|join(', ') }} &mdash; in this exact order</dd></div>
+        <div class="fact"><dt>Probability support</dt>
+          <dd>{{ 'Yes - predict_proba() is available, so ranking uses real class probabilities' if supports_probability else 'No - results are shown as a ranking only' }}</dd></div>
+        <div class="fact"><dt>Reported accuracy</dt>
+          <dd>98.9% on the held-out test split, measured with the corrected preprocessing pipeline</dd></div>
+      </dl>
+
+      {% if importances %}
+      <h3 style="margin-top:1.6rem">Feature importance</h3>
+      <p class="text-muted small">
+        Read directly from the trained model's <code>feature_importances_</code>.
+      </p>
+      <ul class="crop-rank" style="margin-top:.9rem">
+        {% set top = importances.values()|max %}
+        {% for key, value in importances|dictsort(by='value', reverse=true) %}
+        <li>
+          <span class="num" aria-hidden="true">{{ loop.index }}</span>
+          <span>
+            <span class="name">{{ readable[key] }}</span>
+            <span class="bar" style="margin-top:.3rem"><span style="width: {{ (value / top * 100)|round(1) }}%"></span></span>
+          </span>
+          <span class="area">{{ value }}%</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Limitations -->
+  <section class="card mt-lg">
+    <div class="card-body">
+      <h2>Limitations you should know about</h2>
+      <dl class="fact-list">
+        <div class="fact">
+          <dt>Probability is not success</dt>
+          <dd>The percentage is the share of trees voting for a crop. It has not been
+              calibrated or validated against real harvest outcomes.</dd>
+        </div>
+        <div class="fact">
+          <dt>The training data is synthetic in character</dt>
+          <dd>Each crop occupies a tight, well-separated band of values, which is why
+              accuracy is so high. Real fields are messier, so field accuracy will be
+              lower than the test figure.</dd>
+        </div>
+        <div class="fact">
+          <dt>No Tamil Nadu staples in the model</dt>
+          <dd>The model knows {{ crop_count }} crops. Groundnut, cholam, cumbu, ragi,
+              sugarcane and gingelly are not among them, so it can never suggest them
+              however suitable your conditions are.</dd>
+        </div>
+        <div class="fact">
+          <dt>The two features never combine</dt>
+          <dd>Selecting a district does not change the model's prediction, and your
+              soil readings do not change the regional profile.</dd>
+        </div>
+        <div class="fact">
+          <dt>Cultivated area is history, not advice</dt>
+          <dd>The regional ranking reflects what was grown, shaped by irrigation,
+              markets and policy &mdash; not what will grow best on a given field.</dd>
+        </div>
+        <div class="fact">
+          <dt>No rainfall in the regional dataset</dt>
+          <dd>District rainfall is not supplied, so it is shown as "Data not available"
+              rather than filled in from another source.</dd>
+        </div>
+        <div class="fact">
+          <dt>Images are placeholders</dt>
+          <dd>Crop images are illustrations from the supplied asset pack, not
+              photographs. They are labelled as such wherever they appear.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Live status -->
+  <section class="card mt-lg">
+    <div class="card-body">
+      <h2>System status</h2>
+      <dl class="fact-list">
+        <div class="fact"><dt>Model</dt>
+          <dd>{{ 'Loaded' if model_ready else 'Not available &mdash; ' ~ (model_error or 'unknown error') }}</dd></div>
+        <div class="fact"><dt>Preprocessing</dt>
+          <dd>{{ 'Scalers rebuilt from the original training split' if scalers_rebuilt else 'Not rebuilt' }}</dd></div>
+        <div class="fact"><dt>scikit-learn compatibility</dt>
+          <dd>{{ 'Version shim applied to the 1.3.2 pickle; learned parameters unchanged' if compat_patch else 'No shim needed' }}</dd></div>
+        <div class="fact"><dt>Regional dataset</dt>
+          <dd>{{ district_count ~ ' districts loaded (' ~ data_year ~ ')' if regional_ready else 'Not available &mdash; ' ~ (regional_error or 'unknown error') }}</dd></div>
+        <div class="fact"><dt>Crop images</dt>
+          <dd>
+            {{ image_audit.photographs|length }} photographs,
+            {{ image_audit.placeholders|length }} placeholders,
+            {{ image_audit.missing|length }} missing
+          </dd></div>
+        <div class="fact"><dt>Regional source</dt><dd>{{ source }}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Future -->
+  <section class="card mt-lg">
+    <div class="card-body">
+      <h2>Planned, but not built</h2>
+      <p class="text-muted">
+        A combined mode taking district, soil type, NPK, pH, weather and irrigation
+        together would need training data linking all of those to real outcomes.
+        No such dataset was supplied here, so the mode does not exist. The code is
+        organised to accept it later: the ML layer, regional layer, crop registry and
+        image mapping are separate modules, and the district list is already exposed
+        at <code>/api/districts</code>.
+      </p>
+    </div>
+  </section>
+</div>
+{% endblock %}

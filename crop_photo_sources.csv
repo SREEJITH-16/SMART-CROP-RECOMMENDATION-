@@ -1,0 +1,36 @@
+crop_key,display_name,in_ml_model,in_tn_dataset,source_url
+apple,Apple,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Apple_plant.jpg
+banana,Banana,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Banana_Plant%3B.jpg
+blackgram,Black Gram,True,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Black_gram_plant.jpg
+brinjal,Unknown crop,False,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Brinjal_plants.jpg
+chickpea,Chickpea,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Chickpeas%F0%9F%AB%98.jpg
+chilli,Unknown crop,False,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Chilli_plant.jpg
+coconut,Coconut,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Coconut_palm_fruits.jpg
+coffee,Coffee,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Coffee_plant.jpg
+cotton,Cotton,True,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/COTTON_PLANT.jpg
+fingermillet,Ragi (Finger Millet),False,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Finger_millet_field.jpg
+grapes,Grapes,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Grape_fruit.jpg
+greengram,Green Gram,True,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Mung_Bean_plant_%2831884%29.jpg
+groundnut,Groundnut,False,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Groundnut.jpg
+jute,Jute,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Congo_jute.jpg
+kidneybeans,Kidney Beans,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Kidney_beans.jpg
+lentil,Lentil,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Lentil_plants.jpg
+maize,Maize,True,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/MAIZE_CROP.jpg
+mango,Mango,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Mango_Tree.jpg
+mothbeans,Moth Beans,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Matki.JPG
+mungbean,Green Gram,True,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Mung_Bean_plant_%2831884%29.jpg
+muskmelon,Muskmelon,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Muskmelon.jpg
+okra,Unknown crop,False,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Okra_plant.jpg
+orange,Orange,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/An_orange_tree_with_fruits.jpg
+papaya,Papaya,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Papaya_Plant.jpg
+pearlmillet,Cumbu (Pearl Millet),False,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Pearl_millet_in_summer.jpg
+pigeonpeas,Red Gram,True,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Pigeon_pea_plant.jpg
+pomegranate,Pomegranate,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Pomegranate_tree_with_Fruits.jpg
+rice,Rice,True,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Rice_Crops.jpg
+sesame,Gingelly (Sesame),False,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Sesame_plant.jpg
+sorghum,Cholam (Sorghum),False,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Sorghum_crop_Chinawal_08.jpg
+sugarcane,Sugarcane,False,True,https://commons.wikimedia.org/wiki/Special:Redirect/file/Sugarcane_fields.jpg
+tapioca,Unknown crop,False,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Tapioca_%28Manihot_esculenta%29.jpg
+tomato,Unknown crop,False,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Tomato_plant%2A.jpg
+turmeric,Unknown crop,False,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Turmeric_plant_image.jpg
+watermelon,Watermelon,True,False,https://commons.wikimedia.org/wiki/Special:Redirect/file/Watermelon_plant.jpg

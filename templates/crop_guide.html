@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Crop guide &middot; Smart Crop Recommendation{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-head">
+    <h1>Crop guide</h1>
+    <p>
+      One shared library of crop information used by both features. Tags show which
+      system each crop belongs to.
+    </p>
+  </div>
+
+  <div class="grid grid-4">
+    {% for crop in crops %}
+    <a class="crop-tile" href="{{ url_for('crop_detail', crop_key=crop.key) }}">
+      <img src="{{ url_for('static', filename='crops/' ~ crop_image(crop.key)) }}"
+           alt="{{ crop_image_alt(crop.key) }}" loading="lazy" decoding="async">
+      <div class="crop-tile-body">
+        <h3>{{ crop.name }}</h3>
+        <p>{{ crop.category }}</p>
+        <span class="tag-row">
+          {% if crop.in_ml_model %}<span class="tag">AI model</span>{% endif %}
+          {% if crop.in_tn_dataset %}<span class="tag tag-stat">Tamil Nadu data</span>{% endif %}
+        </span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

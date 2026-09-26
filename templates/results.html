@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}Your recommendations &middot; Smart Crop Recommendation{% endblock %}
+
+{% set readable = {'N':'Nitrogen','P':'Phosphorus','K':'Potassium','temperature':'Temperature','humidity':'Humidity','ph':'Soil pH','rainfall':'Rainfall'} %}
+
+{% block content %}
+<div class="container">
+  <div class="page-head">
+    <span class="provenance">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m5 13 4 4L19 7"/></svg>
+      Machine learning prediction
+    </span>
+    <h1 style="margin-top:.8rem">Your top {{ predictions|length }} recommendations</h1>
+    <p>
+      Ranked by the {{ algorithm }}'s own class
+      {{ 'probabilities' if supports_probability else 'output' }} for the seven values you entered.
+    </p>
+  </div>
+
+  {% if supports_probability and predictions|length < 3 %}
+  <div class="alert alert-warn" role="status">
+    <p>
+      The model returned
+      {{ 'only one crop' if predictions|length == 1 else predictions|length ~ ' crops' }}
+      rather than three. Every remaining crop scored exactly zero &mdash; no tree in
+      the forest voted for it &mdash; so listing them would invent a ranking the model
+      never produced. A unanimous result usually means your readings sit squarely
+      inside one crop's range in the training data.
+    </p>
+  </div>
+  {% endif %}
+
+  {% if notices %}
+  <div class="alert alert-warn" role="status">
+    <p><strong>Some values fall outside the model's training range.</strong></p>
+    <ul>{% for notice in notices %}<li>{{ notice }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  {% if not supports_probability %}
+  <div class="alert alert-warn" role="status">
+    <p>
+      This model does not expose class probabilities, so the crops below are a
+      <strong>ranking</strong> only. No confidence figure is shown, because none is available.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- Top 3 cards -->
+  <div class="grid grid-3">
+    {% for item in predictions %}
+      {% set crop = crop_info(item.crop_key) %}
+      <article class="result-card {% if loop.first %}is-top{% endif %}">
+        <div class="result-media">
+          <img src="{{ crop_image_url(item.crop_key) }}"
+               alt="Photograph of {{ crop.name }}" loading="lazy" decoding="async"
+               onerror="this.onerror=null; this.src='{{ url_for('static', filename='crops/' ~ crop_image(item.crop_key)) }}';">
+          <span class="rank-badge rank-{{ item.rank }}" aria-hidden="true">{{ item.rank }}</span>
+          {% if crop_image_is_real_photo(item.crop_key) %}
+            <span class="placeholder-flag" style="background:#1f6f43">Real crop photograph</span>
+          {% elif crop_image_is_placeholder(item.crop_key) %}
+            <span class="placeholder-flag">Illustration fallback</span>
+          {% endif %}
+        </div>
+
+        <div class="result-body">
+          <p class="visually-hidden">Rank {{ item.rank }} of {{ predictions|length }}</p>
+          <h2 class="result-name">{{ crop.name }}</h2>
+          <p class="result-category">{{ crop.category }}</p>
+
+          {% if item.probability_percent is not none %}
+          <div class="meter">
+            <div class="meter-track">
+              <div class="meter-fill" style="--target-width: {{ item.probability_percent }}%"
+                   role="img" aria-label="Model probability {{ item.probability_percent }} percent"></div>
+            </div>
+            <p class="meter-label">
+              <span>Model probability</span>
+              <span class="meter-value">{{ item.probability_percent }}%</span>
+            </p>
+          </div>
+          {% else %}
+          <div class="meter">
+            <p class="meter-label"><span>Model ranking</span><span class="meter-value">#{{ item.rank }}</span></p>
+          </div>
+          {% endif %}
+
+          <div class="why">
+            <h4>Why this crop?</h4>
+            <ul>
+              {% for reason in item.reasons %}
+              <li{% if 'outside' in reason %} class="is-outside"{% endif %}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 13 4 4L19 7"/></svg>
+                <span>{{ reason }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <a class="btn btn-outline btn-sm" href="{{ url_for('crop_detail', crop_key=crop.key) }}">View crop details</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+
+  {% if predictions[0].probability_percent is not none %}
+  <div class="note">
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+    <p>
+      "Model probability" is the share of trees in the forest that voted for that crop.
+      It describes how consistently the model classified your input, not the chance of a
+      successful harvest. Yield depends on irrigation, seed, pests, markets and weather,
+      none of which this model sees.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- Comparison -->
+  <section class="section">
+    <div class="section-head">
+      <h2>Compare the top {{ predictions|length }}</h2>
+      <p>Model output alongside how your readings sit against each crop's recorded range.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table class="data">
+        <caption>Ranges are the minimum and maximum observed for each crop in the training dataset. General rows are indicative characteristics, not measurements from this dataset.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Parameter</th>
+            {% for item in predictions %}<th scope="col">{{ crop_info(item.crop_key).name }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{ 'Model probability' if supports_probability else 'Model rank' }}</th>
+            {% for item in predictions %}
+              <td><strong>{{ item.probability_percent ~ '%' if item.probability_percent is not none else '#' ~ item.rank }}</strong></td>
+            {% endfor %}
+          </tr>
+
+          {% for key in ['N','P','K','ph','temperature','humidity','rainfall'] %}
+          <tr>
+            <th scope="row">
+              {{ readable[key] }}
+              <span class="text-muted small">(you: {{ '%g'|format(inputs[key]) }}{{ ' ' ~ fields[key].unit if fields[key].unit }})</span>
+            </th>
+            {% for item in predictions %}
+              {% set m = item.feature_match.get(key) %}
+              <td>
+                {% if m and m.observed %}
+                  {{ '%g'|format(m.observed[0]) }} &ndash; {{ '%g'|format(m.observed[1]) }}
+                  {% if m.status == 'inside' %}
+                    <span class="tag">match</span>
+                  {% elif m.status == 'near' %}
+                    <span class="tag tag-stat">near</span>
+                  {% else %}
+                    <span class="tag tag-stat">outside</span>
+                  {% endif %}
+                {% else %}
+                  Data not available
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+
+          <tr>
+            <th scope="row">Water requirement <span class="text-muted small">(general)</span></th>
+            {% for item in predictions %}<td>{{ crop_info(item.crop_key).general.water_requirement or 'Data not available' }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">Growing period <span class="text-muted small">(general)</span></th>
+            {% for item in predictions %}<td>{{ crop_info(item.crop_key).general.growing_period or 'Data not available' }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">Soil preference <span class="text-muted small">(general)</span></th>
+            {% for item in predictions %}<td>{{ crop_info(item.crop_key).general.soil or 'Data not available' }}</td>{% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Model transparency -->
+  {% if importances %}
+  <section class="card">
+    <div class="card-body">
+      <h2>What the model weighs most</h2>
+      <p class="text-muted small">
+        These are the trained forest's own <code>feature_importances_</code> values,
+        read straight from the model. They describe the model globally, across all
+        crops, not this particular prediction.
+      </p>
+      <ul class="crop-rank" style="margin-top:1rem">
+        {% set top = importances.values()|max %}
+        {% for key, value in importances|dictsort(by='value', reverse=true) %}
+        <li>
+          <span class="num" aria-hidden="true">{{ loop.index }}</span>
+          <span>
+            <span class="name">{{ readable[key] }}</span>
+            <span class="bar" style="margin-top:.3rem"><span style="width: {{ (value / top * 100)|round(1) }}%"></span></span>
+          </span>
+          <span class="area">{{ value }}%</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  <div class="form-actions">
+    <a class="btn btn-outline" href="{{ url_for('soil_form') }}">Try different values</a>
+  </div>
+</div>
+{% endblock %}

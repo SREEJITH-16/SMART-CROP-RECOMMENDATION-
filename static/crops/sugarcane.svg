@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#eef6ee"/>
+  <circle cx="600" cy="330" r="170" fill="#cfe6cf"/>
+  <path d="M600 500 C560 390 560 260 600 150 C640 260 640 390 600 500Z" fill="#5f9f62"/>
+  <path d="M600 500 C520 440 430 430 350 450" stroke="#4f8c55" stroke-width="28" fill="none" stroke-linecap="round"/>
+  <path d="M600 500 C680 440 770 430 850 450" stroke="#4f8c55" stroke-width="28" fill="none" stroke-linecap="round"/>
+  <text x="600" y="650" text-anchor="middle" font-family="Arial, sans-serif" font-size="54" fill="#244d2a">Sugarcane</text>
+  <text x="600" y="710" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#52705a">Replace with a verified crop photograph</text>
+</svg>

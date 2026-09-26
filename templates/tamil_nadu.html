@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Tamil Nadu districts &middot; Smart Crop Recommendation{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-head">
+    <span class="provenance provenance-stat">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      Official agricultural statistics
+    </span>
+    <h1 style="margin-top:.8rem">Tamil Nadu regional crop profile</h1>
+    <p>
+      Pick a district to see its agro-climatic zone, major soils, and the crops
+      recorded there in {{ data_year }}. This section contains no machine learning.
+    </p>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-error" role="alert"><p>{{ error }}</p></div>
+  {% endif %}
+
+  <div class="grid grid-2">
+    <div class="district-picker">
+      <form method="get" action="{{ url_for('district_detail') }}">
+        <div class="field">
+          <label class="field-label" for="district">Select a district</label>
+          <div class="select-wrap">
+            <select id="district" name="district" required aria-describedby="district-help">
+              <option value="">Choose a district&hellip;</option>
+              {% for name in districts %}
+              <option value="{{ name }}">{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <p class="field-help" id="district-help">
+            {{ districts|length }} districts are available in the dataset.
+          </p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">View district information</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2>About this feature</h2>
+        <p class="text-muted">
+          Crops are ranked by the area actually cultivated in each district, taken
+          from published state statistics. A crop ranks first because more hectares
+          of it were recorded &mdash; not because a model predicts it will do well on
+          your land.
+        </p>
+        <p class="text-muted small" style="margin-bottom:0">
+          <strong>Source:</strong> {{ source }}
+        </p>
+        <div class="note">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <p>
+            No district boundary geometry was supplied with this project, so there is
+            no clickable map. A searchable dropdown is used instead rather than an
+            approximate and misleading map.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
